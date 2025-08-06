@@ -5,35 +5,36 @@ namespace Project.Infrastructure.ExternalServices.StorageServices
 {
     public class FileService : IFileService
     {
-        private readonly string baseDirectory;
-        private readonly string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
-        private readonly long maxFileSize = 5 * 1024 * 1024;
+        private readonly string _baseDirectory;
+        private readonly string[] _allowedExtensions = { ".jpg", ".jpeg", ".png", ".gif", ".bmp" };
+        private readonly long _maxFileSize = 5 * 1024 * 1024;
         public FileService()
         {
-            baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
-            Directory.CreateDirectory(baseDirectory);
+            _baseDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            Directory.CreateDirectory(_baseDirectory);
         }
-        public async Task<string> SaveImage(IFormFile formFile, string folder, CancellationToken cancellationToken = default)
+        public async Task<string> SaveImageAsync(IFormFile formFile, string folder, CancellationToken cancellationToken = default)
         {
             if (!IsValidImage(formFile))
                 throw new Exception("File is invalid or empty.");
-            string folderPath = Path.Combine(baseDirectory, folder);
+            string folderPath = Path.Combine(_baseDirectory, folder);
             string fileName = $"{Guid.NewGuid()}{Path.GetExtension(formFile.FileName)}";
             string filePath = Path.Combine(folderPath, fileName);
+            Directory.CreateDirectory(folderPath);
             using (FileStream fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await formFile.CopyToAsync(fileStream, cancellationToken);
             }
-            return Path.Combine("/uploads",folder, fileName).Replace("\\", "/");
+            return Path.Combine("/uploads", folder, fileName).Replace("\\", "/");
         }
-        public async Task<List<string>> SaveImages(IList<IFormFile> formFiles, string folder, CancellationToken cancellationToken = default)
+        public async Task<List<string>> SaveImagesAsync(IList<IFormFile> formFiles, string folder, CancellationToken cancellationToken = default)
         {
             List<string> filePaths = new List<string>();
             for (int i = 0; i < formFiles.Count; i++)
             {
                 if (IsValidImage(formFiles[i]))
                 {
-                    filePaths.Add(await SaveImage(formFiles[i], folder, cancellationToken));
+                    filePaths.Add(await SaveImageAsync(formFiles[i], folder, cancellationToken));
                 }
             }
             return filePaths;
@@ -42,10 +43,10 @@ namespace Project.Infrastructure.ExternalServices.StorageServices
         {
             if (formFile == null || formFile.Length == 0)
                 return false;
-            if (formFile.Length > maxFileSize)
+            if (formFile.Length > _maxFileSize)
                 return false;
             string extension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
-            return allowedExtensions.Contains(extension);
+            return _allowedExtensions.Contains(extension);
         }
         public bool DeleteFile(string filePath)
         {
@@ -54,7 +55,7 @@ namespace Project.Infrastructure.ExternalServices.StorageServices
             {
                 relativePath = relativePath.Substring("uploads".Length).TrimStart('/', '\\');
             }
-            string fullPath = Path.Combine(baseDirectory, relativePath);
+            string fullPath = Path.Combine(_baseDirectory, relativePath);
             if (File.Exists(fullPath))
             {
                 try
@@ -62,31 +63,30 @@ namespace Project.Infrastructure.ExternalServices.StorageServices
                     File.Delete(fullPath);
                     return true;
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                 }
             }
             return false;
         }
-        public bool FileExits(string filePath)
+        public bool FileExists(string filePath)
         {
-            return File.Exists(Path.Combine(baseDirectory, filePath).Replace("/", "\\"));
+            return File.Exists(Path.Combine(_baseDirectory, filePath).Replace("/", "\\"));
         }
         public bool DeleteFiles(IList<string> filePaths)
         {
             bool allDeleted = true;
             for (int i = 0; i < filePaths.Count; i++)
             {
-                string fullPath = Path.Combine(baseDirectory, filePaths[i]).Replace("/", "\\");
-                if (!DeleteFile(fullPath))
+                if (!DeleteFile(filePaths[i]))
                     allDeleted = false;
             }
             return allDeleted;
         }
         public string GetFileUrl(string relativePath)
         {
-            return $"uploads/{relativePath}";
+            return $"/uploads/{relativePath}";
         }
     }
 }

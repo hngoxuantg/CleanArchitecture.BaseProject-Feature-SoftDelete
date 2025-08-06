@@ -6,25 +6,25 @@ namespace MotorbikeRental.Web.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {
-        private readonly RequestDelegate next;
-        private readonly ILogger<ExceptionHandlingMiddleware> logger;
+        private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger;
         public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
         {
-            this.next = next;
-            this.logger = logger;
+            _next = next;
+            _logger = logger;
         }
-        public async Task Invoke(HttpContext context)
+        public async Task InvokeAsync(HttpContext context)
         {
             try
             {
-                await next(context);
+                await _next(context);
             }
             catch (Exception ex)
             {
-                await HandleError(context, ex);
+                await HandleErrorAsync(context, ex);
             }
         }
-        private async Task HandleError(HttpContext context, Exception ex)
+        private async Task HandleErrorAsync(HttpContext context, Exception ex)
         {
             string message;
             int statusCode;
@@ -43,7 +43,7 @@ namespace MotorbikeRental.Web.Middlewares
                 message = ErrorMessages.SystemError;
                 statusCode = 500;
             }
-            logger.LogError(ex, "Error occurred. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}, ErrorType: {ErrorType}, Message: {Message}", statusCode, errorCode, errorType, message);
+            _logger.LogError(ex, "Error occurred. StatusCode: {StatusCode}, ErrorCode: {ErrorCode}, ErrorType: {ErrorType}, Message: {Message}", statusCode, errorCode, errorType, message);
             context.Response.StatusCode = statusCode;
             context.Response.ContentType = "application/json";
             var response = new
