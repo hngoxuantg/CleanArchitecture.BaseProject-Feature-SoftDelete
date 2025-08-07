@@ -10,7 +10,6 @@ namespace Project.Infrastructure.Data.Contexts.Config
         {
             builder.ToTable("Category");
             builder.HasKey(c => c.Id);
-            builder.Property(c => c.Id).ValueGeneratedOnAdd();
             builder.HasMany(c => c.Products)
                 .WithOne(c => c.Category);
         }

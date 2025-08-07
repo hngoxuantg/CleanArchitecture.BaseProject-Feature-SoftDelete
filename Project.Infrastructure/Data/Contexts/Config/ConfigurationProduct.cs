@@ -10,7 +10,6 @@ namespace Project.Infrastructure.Data.Contexts.Config
         {
             builder.ToTable("Product");
             builder.HasKey(p => p.Id);
-            builder.Property(p => p.Id).ValueGeneratedOnAdd();
             builder.HasOne(p => p.Category)
                 .WithMany(pc => pc.Products)
                 .HasForeignKey(pc => pc.CategoryId)

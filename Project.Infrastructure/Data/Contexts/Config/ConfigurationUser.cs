@@ -8,6 +8,8 @@ namespace Project.Infrastructure.Data.Contexts.Config
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
+            builder.ToTable("User");
+            builder.HasKey(u => u.Id);
         }
     }
 }

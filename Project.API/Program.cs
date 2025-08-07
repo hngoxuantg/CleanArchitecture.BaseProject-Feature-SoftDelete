@@ -1,10 +1,17 @@
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using MotorbikeRental.API.Extensions;
 using MotorbikeRental.Web.Middlewares;
 using Project.API.Extensions;
+using Project.Application.Interfaces.IDataSeedingServices;
 using Project.Common.Options;
 using Project.Infrastructure.Data.Contexts;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +23,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(option =>
     option.UseSqlServer(builder.Configuration.GetConnectionString("PrimaryDbConnection"));
 });
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+builder.Services.Configure<AdminAccount>(builder.Configuration.GetSection("AdminAccount"));
 
 builder.Services.AddMemoryCache();
 builder.Services.Register();
@@ -37,6 +45,22 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = new UrlSegmentApiVersionReader();
+});
+
+builder.Services.AddVersionedApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -66,15 +90,33 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-}); 
+});
 
 var app = builder.Build();
+
+using var scope = app.Services.CreateScope();
+var seedingService = scope.ServiceProvider.GetRequiredService<IDataSeedingService>();
+await seedingService.SeedDataAsync();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.DefaultModelsExpandDepth(-1);
+        var provider = app.Services.GetRequiredService<IApiVersionDescriptionProvider>();
+
+        app.UseSwaggerUI(options =>
+        {
+            foreach (var description in provider.ApiVersionDescriptions)
+            {
+                options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json",
+                                        $"API {description.GroupName.ToUpperInvariant()}");
+            }
+        });
+
+    });
 }
 
 app.UseHttpsRedirection();

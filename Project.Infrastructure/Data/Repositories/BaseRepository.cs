@@ -43,13 +43,37 @@ namespace Project.Infrastructure.Data.Repositories
             return await include.Compile()(query).Where(lamda).FirstOrDefaultAsync(cancellation);
         }
 
-        public async Task<TResult?> GetQueryAsync<TResult>(CancellationToken cancellation = default,
+        public async Task<TResult?> GetQueryUntrackedAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
-            Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null)
+            Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
+            CancellationToken cancellation = default)
         {
             IQueryable<T> query = _dbContext.Set<T>().AsNoTracking();
+            if (include != null)
+                query = include.Compile()(query);
+
+            if (filter != null)
+                query = query.Where(filter);
+
+            if (orderBy != null)
+                query = orderBy.Compile()(query);
+
+            if (selector != null)
+                return await query.Select(selector).FirstOrDefaultAsync(cancellation);
+            else
+                return await query.Cast<TResult>().FirstOrDefaultAsync(cancellation);
+        }
+
+        public async Task<TResult?> GetQueryAsync<TResult>(
+            Expression<Func<T, bool>>? filter = null,
+            Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
+            Expression<Func<T, TResult>>? selector = null,
+            Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
+            CancellationToken cancellation = default)
+        {
+            IQueryable<T> query = _dbContext.Set<T>();
             if (include != null)
                 query = include.Compile()(query);
 

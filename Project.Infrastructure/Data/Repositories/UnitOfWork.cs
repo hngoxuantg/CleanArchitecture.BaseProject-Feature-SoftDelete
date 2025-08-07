@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore.Storage;
 using Project.Domain.Interfaces.IRepositories;
 using Project.Infrastructure.Data.Contexts;
 
@@ -13,20 +12,21 @@ namespace Project.Infrastructure.Data.Repositories
             IUserRepository userRepository,
             ICategoryRepository categoryRepository,
             IProductRepository productRepository,
-            ApplicationDbContext dbContext,
-            IDbContextTransaction transaction)
+            IRefreshTokenRepository refreshTokenRepository,
+            ApplicationDbContext dbContext)
         {
             RoleRepository = roleRepository;
             UserRepository = userRepository;
             CategoryRepository = categoryRepository;
             ProductRepository = productRepository;
+            RefreshTokenRepository = refreshTokenRepository;
             _dbContext = dbContext;
-            _transaction = transaction;
         }
         public IRoleRepository RoleRepository { get; }
         public IUserRepository UserRepository { get; }
         public ICategoryRepository CategoryRepository { get; }
         public IProductRepository ProductRepository { get; }
+        public IRefreshTokenRepository RefreshTokenRepository { get; }
         public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
             return await _dbContext.SaveChangesAsync(cancellationToken);

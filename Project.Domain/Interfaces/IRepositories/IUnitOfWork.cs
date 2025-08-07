@@ -6,6 +6,7 @@
         IUserRepository UserRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         IProductRepository ProductRepository { get; }
+        IRefreshTokenRepository RefreshTokenRepository { get; }
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

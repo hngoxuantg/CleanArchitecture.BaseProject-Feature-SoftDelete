@@ -48,12 +48,12 @@ namespace MotorbikeRental.Web.Middlewares
             context.Response.ContentType = "application/json";
             var response = new
             {
-                Success = false,
-                Message = message,
-                Error = new
+                success = false,
+                message = message,
+                error = new
                 {
-                    Code = errorCode,
-                    Type = errorType
+                    code = errorCode,
+                    type = errorType
                 }
             };
             var json = JsonSerializer.Serialize(response);

@@ -5,5 +5,6 @@ namespace Project.Domain.Entities
     public class User : IdentityUser<Guid>
     {
         public string FullName { get; set; }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; }
     }
 }
