@@ -4,7 +4,6 @@ using Project.Application.Exceptions;
 using Project.Application.Interfaces.IServices;
 using Project.Domain.Entities;
 using Project.Domain.Interfaces.IRepositories;
-using System.Threading.Tasks;
 
 namespace Project.Application.Services
 {
