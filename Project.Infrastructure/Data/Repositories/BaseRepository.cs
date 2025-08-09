@@ -43,7 +43,7 @@ namespace Project.Infrastructure.Data.Repositories
             return await include.Compile()(query).Where(lamda).FirstOrDefaultAsync(cancellation);
         }
 
-        public async Task<TResult?> GetQueryUntrackedAsync<TResult>(
+        public async Task<TResult?> GetOneUntrackedAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
@@ -51,11 +51,11 @@ namespace Project.Infrastructure.Data.Repositories
             CancellationToken cancellation = default)
         {
             IQueryable<T> query = _dbContext.Set<T>().AsNoTracking();
-            if (include != null)
-                query = include.Compile()(query);
-
             if (filter != null)
                 query = query.Where(filter);
+
+            if (include != null)
+                query = include.Compile()(query);
 
             if (orderBy != null)
                 query = orderBy.Compile()(query);
@@ -66,7 +66,7 @@ namespace Project.Infrastructure.Data.Repositories
                 return await query.Cast<TResult>().FirstOrDefaultAsync(cancellation);
         }
 
-        public async Task<TResult?> GetQueryAsync<TResult>(
+        public async Task<TResult?> GetOneAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
@@ -74,11 +74,11 @@ namespace Project.Infrastructure.Data.Repositories
             CancellationToken cancellation = default)
         {
             IQueryable<T> query = _dbContext.Set<T>();
-            if (include != null)
-                query = include.Compile()(query);
-
             if (filter != null)
                 query = query.Where(filter);
+
+            if (include != null)
+                query = include.Compile()(query);
 
             if (orderBy != null)
                 query = orderBy.Compile()(query);

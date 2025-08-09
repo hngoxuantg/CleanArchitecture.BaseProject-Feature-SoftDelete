@@ -4,7 +4,6 @@ using Microsoft.IdentityModel.Tokens;
 using Project.Application.Interfaces.IServices;
 using Project.Common.Options;
 using Project.Domain.Entities;
-using Project.Domain.Interfaces.IRepositories;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;

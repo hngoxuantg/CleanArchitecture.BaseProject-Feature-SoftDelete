@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Project.Domain.Entities
+﻿namespace Project.Domain.Entities
 {
     public class RefreshToken : BaseEntity
     {

@@ -25,8 +25,8 @@ namespace Project.Application.Services
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                User? user = await _unitOfWork.UserRepository.GetQueryAsync<User>(filter: u => u.UserName == loginDto.UserName, cancellation: cancellationToken)
-                    ?? throw new NotFoundException($"User with username {loginDto.UserName} not found");
+                User? user = await _unitOfWork.UserRepository.GetOneAsync<User>(filter: u => u.UserName == loginDto.UserName, cancellation: cancellationToken)
+                    ?? throw new NotFoundException($"User with UserName {loginDto.UserName} not found");
 
                 if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
                     throw new ValidatorException($"Invalid password for user {loginDto.UserName}");
@@ -55,9 +55,12 @@ namespace Project.Application.Services
             if (string.IsNullOrEmpty(refreshToken))
                 throw new ValidatorException("Refresh token is required");
 
-            RefreshToken? oldToken = await _unitOfWork.RefreshTokenRepository.GetQueryAsync<RefreshToken>(
+            RefreshToken? oldToken = await _unitOfWork.RefreshTokenRepository.GetOneAsync<RefreshToken>(
                 filter: r => r.Token == refreshToken,
                 cancellation: cancellationToken) ?? throw new NotFoundException("Refresh token not found");
+
+            if (!oldToken.IsActive)
+                throw new ValidatorException("Refresh token is not active or has expired");
 
             oldToken.Revoke();
 
@@ -71,15 +74,12 @@ namespace Project.Application.Services
             await _unitOfWork.BeginTransactionAsync(cancellationToken);
             try
             {
-                RefreshToken? oldToken = await _unitOfWork.RefreshTokenRepository.GetQueryAsync<RefreshToken>(
+                RefreshToken? oldToken = await _unitOfWork.RefreshTokenRepository.GetOneAsync<RefreshToken>(
                     filter: r => r.Token == refreshToken,
                     cancellation: cancellationToken) ?? throw new NotFoundException("Refresh token not found");
 
                 if (!oldToken.IsActive)
                     throw new ValidatorException("Refresh token is not active or has expired");
-
-                if (oldToken.DeviceInfo != deviceInfo || oldToken.IpAddress != ipAddress)
-                    throw new ValidatorException("Refresh token is not valid for this device or IP address");
 
                 User? user = await _unitOfWork.UserRepository.GetByIdAsync(oldToken.UserId, cancellation: cancellationToken)
                     ?? throw new NotFoundException("User not found");

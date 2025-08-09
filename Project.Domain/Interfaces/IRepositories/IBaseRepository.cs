@@ -12,14 +12,14 @@ namespace Project.Domain.Interfaces.IRepositories
             Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
             CancellationToken cancellation = default);
 
-        Task<TResult?> GetQueryUntrackedAsync<TResult>(
+        Task<TResult?> GetOneUntrackedAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,
             Expression<Func<IQueryable<T>, IQueryable<T>>>? include = null,
             CancellationToken cancellation = default);
 
-        Task<TResult?> GetQueryAsync<TResult>(
+        Task<TResult?> GetOneAsync<TResult>(
             Expression<Func<T, bool>>? filter = null,
             Expression<Func<IQueryable<T>, IOrderedQueryable<T>>>? orderBy = null,
             Expression<Func<T, TResult>>? selector = null,

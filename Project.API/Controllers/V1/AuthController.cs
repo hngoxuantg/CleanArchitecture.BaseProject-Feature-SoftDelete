@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Project.Application.DTOs;
 using Project.Application.Interfaces.IServices;
 using Project.Common.Models.Responses;
-using System.Threading.Tasks;
 
 namespace Project.API.Controllers.V1
 {
@@ -53,6 +52,7 @@ namespace Project.API.Controllers.V1
                 Success = true
             });
         }
+        [AllowAnonymous]
         [HttpPost("refresh-token")]
         public async Task<IActionResult> RefreshAsync(CancellationToken cancellationToken = default)
         {
