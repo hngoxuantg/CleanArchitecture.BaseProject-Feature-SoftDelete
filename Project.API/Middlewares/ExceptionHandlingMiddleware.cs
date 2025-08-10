@@ -2,7 +2,7 @@ using Project.Application.Exceptions;
 using Project.Common.Constants;
 using System.Text.Json;
 
-namespace MotorbikeRental.Web.Middlewares
+namespace Project.API.Middlewares
 {
     public class ExceptionHandlingMiddleware
     {

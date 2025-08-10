@@ -1,17 +1,15 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using MotorbikeRental.API.Extensions;
-using MotorbikeRental.Web.Middlewares;
 using Project.API.Extensions;
 using Project.Application.Interfaces.IDataSeedingServices;
 using Project.Common.Options;
 using Project.Infrastructure.Data.Contexts;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using Project.API.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 

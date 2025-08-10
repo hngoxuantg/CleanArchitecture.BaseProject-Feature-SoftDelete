@@ -1,12 +1,11 @@
-﻿namespace Project.Domain.Interfaces.IRepositories
+﻿using Project.Domain.Interfaces.IRepositories.IBaseRepositories;
+
+namespace Project.Domain.Interfaces.IRepositories
 {
     public interface IUnitOfWork
     {
-        IRoleRepository RoleRepository { get; }
-        IUserRepository UserRepository { get; }
-        ICategoryRepository CategoryRepository { get; }
-        IProductRepository ProductRepository { get; }
-        IRefreshTokenRepository RefreshTokenRepository { get; }
+        IReadRepository<T> GetReadRepository<T>() where T : class;
+        IWriteRepository<T> GetWriteRepository<T>() where T : class;
 
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
         Task BeginTransactionAsync(CancellationToken cancellationToken = default);

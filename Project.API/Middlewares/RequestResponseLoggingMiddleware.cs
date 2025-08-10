@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace MotorbikeRental.Web.Middlewares
+namespace Project.API.Middlewares
 {
     public class RequestResponseLoggingMiddleware
     {
